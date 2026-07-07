@@ -1,6 +1,6 @@
 # interview-me-senior
 
-A Claude Code / GitHub Copilot CLI [agent skill](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) that puts you in front of a staff-level interviewer for the change you just shipped — and scores you.
+A Claude Code / GitHub Copilot CLI / OpenAI Codex [agent skill](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) that puts you in front of a staff-level interviewer for the change you just shipped — and scores you.
 
 ## What it does
 
@@ -55,6 +55,24 @@ Windows (PowerShell):
 
 ```powershell
 Copy-Item -Recurse interview-me\interview-me-senior "$HOME\.copilot\skills\"
+```
+
+### OpenAI Codex CLI
+
+Codex discovers skills from `~/.codex/skills/` (personal, all projects) or a repo's `.codex/skills/` (project-scoped). Copy the folder in — Codex picks it up on the next session (restart Codex if it doesn't appear):
+
+macOS/Linux:
+
+```bash
+mkdir -p ~/.codex/skills
+cp -r interview-me-senior ~/.codex/skills/
+```
+
+Windows (PowerShell):
+
+```powershell
+New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
+Copy-Item -Recurse interview-me-senior "$HOME\.codex\skills\"
 ```
 
 ## Usage
