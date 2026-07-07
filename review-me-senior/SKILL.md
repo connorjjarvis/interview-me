@@ -3,6 +3,7 @@ name: review-me-senior
 description: A staff-level review copilot for a branch or PR. Reads the diff, gives you a ranked map of review points (correctness, risk, design, tests, security, nits) each with the reasoning and a draftable comment in your voice, then lets you drill into the ones that matter. It does not score you and does not post anything — it helps you understand the code and write the review yourself, and it learns your project's conventions over time. Use when the user says "review me", "review this branch", "review this PR", "help me review", or "help me write a review". (For being interviewed and scored on your own decisions, use interview-me-senior instead.)
 ---
 
+```
 # CONFIG — edit these defaults to retune the review.
 bar_level: staff             # mid | senior | staff | principal
 categories: correctness, risk, design, maintainability, tests, security, nit, question   # remove any to mute
@@ -16,6 +17,7 @@ save_dir: ~/.review-me-senior/<repo-name>/    # saved review notes — OUT OF RE
 save_notes: ask              # ask | always | never
 include_diff_snippets: true  # quote reviewed code in SAVED notes (terminal always shows it)
 redact_secrets: true
+```
 
 ---
 
@@ -52,7 +54,7 @@ analysis. The only things you say in this phase are the focus question in step 4
    - If the current branch **is** the default branch (or no merge-base/diff is
      found), fall back to staged changes: `git diff --staged`.
    - If there are no staged changes, fall back to the last commit:
-     `git show HEAD` / `git diff HEAD~1...HEAD`.
+     `git show HEAD` / `git diff HEAD~1 HEAD`.
    - Read the resulting diff in full. Also read the surrounding context of changed
      files wherever you need it to judge a point (e.g. to confirm a call site, a
      base-class attribute, or an existing helper). `diff` is always a context
@@ -264,7 +266,10 @@ When saving, build the notes in the exact shape of
 
 Then **save** the file (resolve the destination via Artifact safety below) and
 **print the saved path** to the terminal. Filename:
-`<YYYY-MM-DD>-<branch>.md`.
+`<YYYY-MM-DD>-<branch>.md` — first **slugify** the branch name: replace any
+`/` (and other path-unsafe characters) with `-`, so the filename is always a
+single flat file and never implies a nested folder (e.g. `feature/x` →
+`feature-x`).
 
 ## Artifact safety (HARD requirements — enforce in this exact order)
 

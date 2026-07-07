@@ -53,7 +53,7 @@ described below.
    - If the current branch **is** the default branch (or no merge-base/diff is
      found), fall back to staged changes: `git diff --staged`.
    - If there are no staged changes, fall back to the last commit:
-     `git show HEAD` / `git diff HEAD~1...HEAD`.
+     `git show HEAD` / `git diff HEAD~1 HEAD`.
    - Read the resulting diff in full. Also read surrounding context of changed
      files where you need it to understand a decision. `diff` is always a context
      source; you cannot opt out of it.
@@ -249,7 +249,10 @@ These are mandatory. Apply them before writing any file.
    to the current repo's directory name. The default therefore resolves to
    `<home>/.interview-me/<repo-name>/`, which is **outside** the repo. Create the
    directory (and parents) if it does not exist. Filenames:
-   `<YYYY-MM-DD>-<branch-or-topic>.md` and `…-<branch-or-topic>.html`.
+   `<YYYY-MM-DD>-<branch-or-topic>.md` and `…-<branch-or-topic>.html` — first
+   **slugify** `<branch-or-topic>`: replace any `/` (and other path-unsafe
+   characters) with `-`, so both filenames are always a single flat file and
+   never imply a nested folder (e.g. `feature/x` → `feature-x`).
 
 2. **If the resolved `save_dir` is inside the current repo** (only possible when the
    user overrode the default to a repo-internal path). Determine this explicitly:
