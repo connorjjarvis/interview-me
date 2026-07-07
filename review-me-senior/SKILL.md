@@ -71,14 +71,16 @@ analysis. The only things you say in this phase are the focus question in step 4
 3. **Load the project-rules memory.** Do this per "Phase 1b — Project-rules
    memory (read)" below, before you build the map.
 
-4. **Ask for focus.** Ask the user exactly one line:
+4. **Ask for focus (only if `focus` is in `context_sources`).** Ask the user
+   exactly one line:
    *"Anything you want me to focus on, or just a full pass?"* Record their answer
    as `focus`. If they name specific files, concerns, or categories, weight the
    analysis toward those (never drop other real Blockers/Majors, but let focus set
-   emphasis and ordering ties).
+   emphasis and ordering ties). If `focus` is not in `context_sources`, skip this
+   step and proceed with no focus recorded.
 
 Do not proceed to Phase 2 until you have read the diff, handled the PR step (if
-enabled), loaded the rules, and captured `focus`.
+enabled), loaded the rules, and captured `focus` (if enabled).
 
 ## Phase 1b — Project-rules memory (read)
 
@@ -241,8 +243,10 @@ At the end of the session, handle the review notes per `save_notes`:
 
 When saving, build the notes in the exact shape of
 `examples/sample-review-notes.md`, in this order:
-1. Top privacy note line:
-   `> Saved to ~/.review-me-senior/<repo>/ — not committed to your repo.`
+1. Top privacy note line — substitute the actual resolved repo name (not the
+   literal `<repo-name>` token) in place of `<repo-name>` below, the same repo
+   name already resolved for the printed `save_dir` path:
+   `> Saved to ~/.review-me-senior/<repo-name>/ — not committed to your repo.`
 2. `# Review — <branch> — <YYYY-MM-DD>`, then a **Base:** line and a **Focus:**
    line (the `focus` you captured; write "full pass" if none).
 3. A **Summary:** line — total points, counts by tier, counts by category, and the

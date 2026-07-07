@@ -1,6 +1,6 @@
-# interview-me-senior
+# interview-me
 
-A Claude Code / GitHub Copilot CLI / OpenAI Codex [agent skill](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) that puts you in front of a staff-level interviewer for the change you just shipped — and scores you.
+A home for two independent, staff-level [agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) for Claude Code, GitHub Copilot CLI, and OpenAI Codex: one interviews you on the decisions behind a change you just shipped and scores you, the other reviews a branch or PR and drafts the comments for you.
 
 ## What it does
 
