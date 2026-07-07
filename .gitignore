@@ -1,0 +1,11 @@
+# Personal interview scorecards must never be committed, even if a user
+# overrides save_dir to point inside this repo.
+interviews/
+*.interview.md
+*.interview.html
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vs/
+.idea/
