@@ -17,8 +17,7 @@ include_transcript: true
 include_diff_snippets: false
 redact_secrets: true
 auto_open: false
-# dimensions (score each 1-4): Technical judgment, Trade-off awareness,
-#   Risk & edge-case thinking, Communication/clarity, Business/context alignment
+dimensions: Technical judgment, Trade-off awareness, Risk & edge-case thinking, Communication/clarity, Business/context alignment   # score each 1-4
 ```
 
 ---

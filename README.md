@@ -14,8 +14,16 @@ It is not a collaborator. It doesn't suggest fixes, doesn't offer to refactor, d
 
 Copy `interview-me-senior/` into your `~/.claude/skills/`.
 
+macOS/Linux:
+
 ```bash
 cp -r interview-me-senior ~/.claude/skills/
+```
+
+Windows (PowerShell):
+
+```powershell
+Copy-Item -Recurse interview-me-senior "$HOME\.claude\skills\"
 ```
 
 ## Usage

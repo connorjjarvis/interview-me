@@ -1,8 +1,8 @@
 # Personal interview scorecards must never be committed, even if a user
-# overrides save_dir to point inside this repo.
+# overrides save_dir to point inside this repo. The skill appends the actual
+# override directory here at runtime if it isn't already ignored; interviews/
+# is just the sensible default for that override.
 interviews/
-*.interview.md
-*.interview.html
 
 # OS / editor noise
 .DS_Store
