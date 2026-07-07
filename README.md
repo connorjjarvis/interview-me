@@ -10,70 +10,88 @@ It probes weak answers with a single follow-up, asks one stretch question above 
 
 It is not a collaborator. It doesn't suggest fixes, doesn't offer to refactor, doesn't invoke `brainstorming`. It interrogates and it grades.
 
+## Skills in this repo
+
+This repo ships two independent skills. Install either one on its own, or both — they don't depend on each other.
+
+- **[`interview-me-senior`](interview-me-senior/)** — get interviewed and scored on the decisions in a change you just made.
+- **[`review-me-senior`](review-me-senior/)** — a review copilot: ranked review points + draftable comments for a branch/PR, learns your conventions, no score.
+
+`review-me-senior` has its own config block at the top of [`review-me-senior/SKILL.md`](review-me-senior/SKILL.md). See a full worked example in [`review-me-senior/examples/sample-review-notes.md`](review-me-senior/examples/sample-review-notes.md), and the format it learns your conventions into in [`review-me-senior/examples/sample-rules.md`](review-me-senior/examples/sample-rules.md).
+
+The rest of this README covers `interview-me-senior` in detail.
+
 ## Install
 
-The skill lives in the `interview-me-senior/` directory of this repo. Install it into whichever tool you use — the `SKILL.md` format is the shared [Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) standard, so the same folder works for both.
+This repo ships `interview-me-senior/` and `review-me-senior/`. Install whichever one(s) you want into whichever tool you use — the `SKILL.md` format is the shared [Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) standard, so the same folders work across all three.
 
 ### Claude Code
 
-Copy `interview-me-senior/` into your `~/.claude/skills/`.
+Copy the skill folder(s) you want into your `~/.claude/skills/`.
 
-macOS/Linux:
+macOS/Linux (both skills):
 
 ```bash
-cp -r interview-me-senior ~/.claude/skills/
+cp -r interview-me-senior review-me-senior ~/.claude/skills/
 ```
 
-Windows (PowerShell):
+Windows (PowerShell, both skills):
 
 ```powershell
-Copy-Item -Recurse interview-me-senior "$HOME\.claude\skills\"
+Copy-Item -Recurse interview-me-senior,review-me-senior "$HOME\.claude\skills\"
 ```
+
+Only want one? Copy just that folder, e.g. `cp -r review-me-senior ~/.claude/skills/`.
 
 ### GitHub Copilot CLI
 
 Copilot CLI discovers Agent Skills from `~/.copilot/skills/` (personal, all projects) or a repo's `.github/skills/` (project-scoped). Two ways to install:
 
-**Option A — `copilot skill add` (recommended).** Point it at the skill directory:
+**Option A — `copilot skill add` (recommended).** Point it at whichever skill directory(s) you want — run it once per skill:
 
 ```bash
 git clone https://github.com/connorjjarvis/interview-me.git
 copilot skill add ./interview-me/interview-me-senior
+copilot skill add ./interview-me/review-me-senior
 ```
 
-If you're already in a session, run `/skills reload`, then confirm it loaded with `/skills info interview-me-senior`.
+If you're already in a session, run `/skills reload`, then confirm it loaded with `/skills info interview-me-senior` or `/skills info review-me-senior`.
 
 **Option B — copy it in manually.**
 
-macOS/Linux:
+macOS/Linux (both skills):
 
 ```bash
-cp -r interview-me/interview-me-senior ~/.copilot/skills/
+cp -r interview-me/interview-me-senior interview-me/review-me-senior ~/.copilot/skills/
 ```
 
-Windows (PowerShell):
+Windows (PowerShell, both skills):
 
 ```powershell
-Copy-Item -Recurse interview-me\interview-me-senior "$HOME\.copilot\skills\"
+Copy-Item -Recurse interview-me\interview-me-senior,interview-me\review-me-senior "$HOME\.copilot\skills\"
 ```
+
+Only want one? Run `copilot skill add` (or the copy) for just that folder.
 
 ### OpenAI Codex CLI
 
-Codex discovers skills from `~/.codex/skills/` (personal, all projects) or a repo's `.codex/skills/` (project-scoped). Copy the folder in — Codex picks it up on the next session (restart Codex if it doesn't appear):
+Codex discovers skills from `~/.codex/skills/` (personal, all projects) or a repo's `.codex/skills/` (project-scoped). Copy the folder(s) in — Codex picks them up on the next session (restart Codex if they don't appear):
 
-macOS/Linux:
+macOS/Linux (both skills):
 
 ```bash
 mkdir -p ~/.codex/skills
-cp -r interview-me-senior ~/.codex/skills/
+cp -r interview-me-senior review-me-senior ~/.codex/skills/
 ```
 
-Windows (PowerShell):
+Windows (PowerShell, both skills):
 
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
-Copy-Item -Recurse interview-me-senior "$HOME\.codex\skills\"
+Copy-Item -Recurse interview-me-senior,review-me-senior "$HOME\.codex\skills\"
 ```
+
+Only want one? Copy just that folder instead.
 
 ## Usage
 
