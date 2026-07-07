@@ -150,7 +150,11 @@ Only if `bonus_question` is true. Ask **one** question at
 `bar_level` + `bonus_offset` (e.g. staff + `+1` = principal). Frame it
 **systemically / organisationally**, not about this one diff — e.g. *"If every team
 in the org made this same call independently, what breaks, and what would you put
-in place to stop it?"*
+in place to stop it?"* If `bar_level` + `bonus_offset` would land above the top
+defined level (`principal`), do not invent a level name — instead frame the stretch
+question one notch broader still, at a systemic/organisational/industry-wide scope
+(e.g. "across the industry" or "as a standard other companies would adopt"), and
+treat it as the resolved stretch level for scoring and reporting purposes.
 
 - Score it **separately** from the core dimensions, against the same 4-point rubric
   but at the stretch level.
@@ -215,6 +219,11 @@ Compute and render, in this order.
    - `{{OVERALL_MAX}}` → "4"
    - `{{VERDICT}}` → the plain-English verdict
    - `{{STRENGTHS}}`, `{{GAPS}}`, `{{READING_LIST}}` → `<li>…</li>` items
+   - `{{BONUS_LEVEL}}` → the human-readable resolved stretch level, i.e.
+     `bar_level` + `bonus_offset` (e.g. `bar_level: staff` and `bonus_offset: +1` →
+     "Principal"). If that would exceed the top defined level (`principal`), use
+     the clamped systemic/organisational/industry-wide label from Phase 4 instead
+     of inventing a level name (e.g. "Industry-wide").
    - `{{BONUS_RESULT}}` → one sentence on the stretch question outcome
    - `{{DIMENSION_ROWS}}` → the dimension rows. Take the block between the
      `<!--ROW-->` and `<!--/ROW-->` markers as a template; **clone it once per
@@ -244,7 +253,10 @@ These are mandatory. Apply them before writing any file.
    `<YYYY-MM-DD>-<branch-or-topic>.md` and `…-<branch-or-topic>.html`.
 
 2. **If the resolved `save_dir` is inside the current repo** (only possible when the
-   user overrode the default to a repo-internal path):
+   user overrode the default to a repo-internal path). Determine this explicitly:
+   resolve `save_dir` to an absolute path, get the repository root via
+   `git rev-parse --show-toplevel`, and check whether the resolved path is under
+   that root. If it is, treat it as "inside the repo" and apply the guard below:
    - Ensure that directory is listed in the repo's `.gitignore`. If it is absent,
      append it.
    - Check whether the target path is already git-tracked (`git ls-files --
