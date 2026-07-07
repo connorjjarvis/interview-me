@@ -9,3 +9,6 @@ interviews/
 Thumbs.db
 .vs/
 .idea/
+
+# Subagent-driven-development scratch (local only)
+.superpowers/
