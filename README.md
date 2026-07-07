@@ -1,6 +1,6 @@
 # interview-me-senior
 
-A Claude Code skill that puts you in front of a staff-level interviewer for the change you just shipped — and scores you.
+A Claude Code / GitHub Copilot CLI [agent skill](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) that puts you in front of a staff-level interviewer for the change you just shipped — and scores you.
 
 ## What it does
 
@@ -11,6 +11,10 @@ It probes weak answers with a single follow-up, asks one stretch question above 
 It is not a collaborator. It doesn't suggest fixes, doesn't offer to refactor, doesn't invoke `brainstorming`. It interrogates and it grades.
 
 ## Install
+
+The skill lives in the `interview-me-senior/` directory of this repo. Install it into whichever tool you use — the `SKILL.md` format is the shared [Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) standard, so the same folder works for both.
+
+### Claude Code
 
 Copy `interview-me-senior/` into your `~/.claude/skills/`.
 
@@ -24,6 +28,33 @@ Windows (PowerShell):
 
 ```powershell
 Copy-Item -Recurse interview-me-senior "$HOME\.claude\skills\"
+```
+
+### GitHub Copilot CLI
+
+Copilot CLI discovers Agent Skills from `~/.copilot/skills/` (personal, all projects) or a repo's `.github/skills/` (project-scoped). Two ways to install:
+
+**Option A — `copilot skill add` (recommended).** Point it at the skill directory:
+
+```bash
+git clone https://github.com/connorjjarvis/interview-me.git
+copilot skill add ./interview-me/interview-me-senior
+```
+
+If you're already in a session, run `/skills reload`, then confirm it loaded with `/skills info interview-me-senior`.
+
+**Option B — copy it in manually.**
+
+macOS/Linux:
+
+```bash
+cp -r interview-me/interview-me-senior ~/.copilot/skills/
+```
+
+Windows (PowerShell):
+
+```powershell
+Copy-Item -Recurse interview-me\interview-me-senior "$HOME\.copilot\skills\"
 ```
 
 ## Usage
