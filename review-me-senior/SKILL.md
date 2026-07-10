@@ -7,6 +7,7 @@ description: A staff-level review copilot for a branch or PR. Reads the diff, gi
 # CONFIG — edit these defaults to retune the review.
 bar_level: staff             # mid | senior | staff | principal
 categories: correctness, risk, design, maintainability, tests, security, nit, question   # remove any to mute
+best_practice_packs: auto    # auto (detect from the diff) | none | explicit list e.g. dotnet, blazor-fsd (packs live in references/)
 tone: instructive            # warm | instructive | blunt
 context_sources: diff, pr, focus    # diff always on; pr = optional pasted/fetched PR; focus = one-line focus prompt
 draft_comments: true
@@ -73,7 +74,30 @@ analysis. The only things you say in this phase are the focus question in step 4
 3. **Load the project-rules memory.** Do this per "Phase 1b — Project-rules
    memory (read)" below, before you build the map.
 
-4. **Ask for focus (only if `focus` is in `context_sources`).** Ask the user
+4. **Resolve and load the best-practice packs.** Packs are curated anti-pattern
+   lists living as Markdown files under `references/` (relative to this skill).
+   Each pack file starts with a `# <name> pack` header and an `**Applies to:**`
+   line that names its detection signals — file extensions (e.g. `*.cs`,
+   `*.razor`) and optional telltale imports/usings (e.g. `using Fluxor`,
+   `using MudBlazor`). Resolve `best_practice_packs`:
+   - **`none`** → load no packs. Skip the rest of this step.
+   - **explicit list** (e.g. `dotnet, blazor-fsd`) → load exactly those named
+     files from `references/` (`<name>.md`). If a named pack file is missing, note
+     it silently to yourself and carry on with the ones that exist.
+   - **`auto`** (the default) → scan the changed files in the diff: collect their
+     extensions and the telltale imports/usings they add or touch. Then, for every
+     pack file present in `references/`, read its `**Applies to:**` line and
+     **enable that pack if any of its signals match** what the diff contains. For
+     example, a changed `*.cs` file enables `dotnet`; a changed `*.razor` file, or
+     C# containing `using Fluxor` / `using MudBlazor`, enables `blazor-fsd`. A pack
+     whose signals match nothing in the diff stays disabled.
+   Read each enabled pack file in full so its entries are available in Phase 2.
+   Keep the list of active packs to yourself for now — this phase is silent — but
+   you MAY name the active packs once at the Phase 2 → overview handoff (see
+   Phase 3). If no packs are enabled, that is fine: the review proceeds on the core
+   rubric alone.
+
+5. **Ask for focus (only if `focus` is in `context_sources`).** Ask the user
    exactly one line:
    *"Anything you want me to focus on, or just a full pass?"* Record their answer
    as `focus`. If they name specific files, concerns, or categories, weight the
@@ -82,7 +106,8 @@ analysis. The only things you say in this phase are the focus question in step 4
    step and proceed with no focus recorded.
 
 Do not proceed to Phase 2 until you have read the diff, handled the PR step (if
-enabled), loaded the rules, and captured `focus` (if enabled).
+enabled), loaded the rules, resolved and loaded the packs, and captured `focus`
+(if enabled).
 
 ## Phase 1b — Project-rules memory (read)
 
@@ -139,6 +164,30 @@ raise). Produce a set of **review points**. Each point carries all of these fiel
   (default); `blunt` = direct and terse. A `question`-category comment is phrased
   as a genuine question, not a veiled assertion.
 
+**Sweep the smell checklist mechanically — before you rank.** Recall is the job
+here: do a deliberate, category-by-category pass over the diff looking for each
+smell below, rather than only flagging what jumps out at you on a first read. Walk
+the list, check the changed code against every item, and turn each real hit into a
+review point (with its own `file:line`, tier, confidence, observation, and why).
+This is language-general — it names no framework or stack; that knowledge lives in
+the packs. Then rank everything together.
+
+- **maintainability** — long methods or long parameter lists; duplicated logic;
+  deep nesting / high cyclomatic complexity; primitive obsession (raw `int`/
+  `string` where a type belongs); magic numbers and magic strings; unclear or
+  misleading names; dead code (unreachable, unused, commented-out); comments that
+  contradict or lag the code; God classes / God functions doing too much; boolean
+  parameters that make a call site unreadable.
+- **risk** — swallowed or empty `catch` blocks; missing or sloppy null handling;
+  unvalidated input crossing a trust boundary; undisposed resources / leaked
+  handles; off-by-one and boundary errors; unbounded loops, recursion, or
+  collections that can grow without limit; silent fallbacks that hide a failure
+  instead of surfacing it.
+- **correctness** — wrong conditions, inverted logic, bad or unreachable state
+  transitions, mishandled edge cases. **security** — injection, missing authz/
+  authn, secret/credential handling, trusting unsafe input. **tests** — the change
+  has no test, or the test is too weak to catch the regression it should.
+
 **Apply the loaded rules** (from Phase 1b) as you build the map:
 - A point that matches an **`accepted`** rule is **filtered out** of the ranked map
   (or, if you think the user should still see it was considered, greyed and labelled
@@ -150,6 +199,35 @@ raise). Produce a set of **review points**. Each point carries all of these fiel
   point on any new endpoint that lacks one).
 - A **`forbidden`** rule becomes an **active check**: flag every occurrence of the
   pattern (typically as a Blocker or Major in its category).
+
+**Apply the enabled best-practice packs** (loaded in Phase 1 recon step 4) as you
+build the map. For each enabled pack, treat **every entry in it as an active check
+against the diff** — the same mechanical, don't-wait-for-it-to-jump-out discipline
+as the smell sweep above. When an entry's **Flag** matches code in the diff, emit a
+normal review point:
+- Use the entry's **Category** and **Tier** as the point's category and tier. You
+  MAY adjust the tier by judgment for this specific diff (e.g. downgrade a Major to
+  a Minor when the context makes it low-stakes, or upgrade it when the blast radius
+  is large) — but keep the entry's category.
+- Use the entry's **Why** as the teaching (the point's *why*); ground the
+  *observation* in the actual diff line, not the pack's generic example.
+- **Tag the point with its pack name in square brackets** — prefix the observation
+  with the tag, e.g. `[dotnet] user!.Profile!.Name silences the nullable warning…`
+  or `[blazor-fsd] state mutated directly in the component…`. This tag is not
+  decorative: it must survive into the overview line and the saved notes (see
+  Phase 3 and Phase 5) so the user can see the finding came from a pack and learn
+  the rule.
+- Set **confidence** as usual (`hunch` if the match depends on context you can't
+  see in the diff).
+
+Pack findings are ordinary review points from here on: they rank, drill in, and get
+drafted exactly like any other point. **`rules.md` memory still wins over a pack.**
+Apply the rule-matching above to pack findings too: a pack finding that matches an
+**`accepted`** rule is filtered out (and counted among the filtered points, exactly
+as today) — a blessed pattern stays blessed even when a pack would otherwise flag
+it. If two enabled packs (or a pack and the core smell sweep) flag the same line for
+the same reason, merge them into one point rather than listing duplicates — keep
+the `[pack]` tag on the merged point so the source stays visible.
 
 **Rank the map.** Sort by tier first (`Blocker` → `Major` → `Minor` → `Nit`), then
 group by category within a tier, and always keep `nit` points last regardless.
@@ -163,7 +241,12 @@ Now speak. Print the ranked map as a numbered list. One line per point:
 `<n>. `file:line` · <category> · <tier> · <one-line reason>`
 
 sorted tier-first with nits last, exactly as ranked in Phase 2. Keep each reason to
-a single line — the detail comes in drill-in. Above or below the list, print a
+a single line — the detail comes in drill-in. For a point that came from a
+best-practice pack, keep its `[pack]` tag visible on this line (carry it in the
+observation/reason, e.g. `… · [dotnet] null-forgiving `!` silences a real null`) so
+the source is clear at a glance. If any packs were enabled in recon, you MAY note
+them once here as the handoff — a single line such as *"Active packs: dotnet,
+blazor-fsd"* — but keep it to that one mention. Above or below the list, print a
 one-line summary: total points, the tier counts (e.g. "2 Blocker, 3 Major, 2 Minor,
 1 Nit"), and — if any points were filtered by an `accepted` rule — a note like
 "1 point filtered as known-OK per rules.md". Then invite the user to drill in,
@@ -255,11 +338,14 @@ When saving, build the notes in the exact shape of
    count of any points filtered as known-OK per `rules.md`.
 4. `## Review map` — the **full ranked list** (nothing dropped): each point as
    `<n>. `path:line` · category · tier · one-line reason`, Blocker→Nit, nits last.
+   Keep any `[pack]` tag in the reason so the map shows which findings came from a
+   pack.
 5. `## Detail` — one block per point the user **drilled into** (not every point):
    a `### <n>. `path:line` — category · tier · confidence: <certain|hunch>` header,
    the code snippet (subject to `include_diff_snippets`, see safety rules), the
-   **Observation**, the **Why**, and the **Draft comment kept** (the final drafted
-   comment, including any redraft the user settled on).
+   **Observation** (keep its leading `[pack]` tag for pack-sourced points), the
+   **Why**, and the **Draft comment kept** (the final drafted comment, including any
+   redraft the user settled on).
 6. `## Rules added this session` — one bullet per rule written this session
    (verdict, description, scope, rationale, date, and a note that it was written on
    confirmation). If none were added, write "None."
