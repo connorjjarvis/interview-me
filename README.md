@@ -19,6 +19,10 @@ This repo ships two independent skills. Install either one on its own, or both �
 
 `review-me-senior` has its own config block at the top of [`review-me-senior/SKILL.md`](review-me-senior/SKILL.md). See a full worked example in [`review-me-senior/examples/sample-review-notes.md`](review-me-senior/examples/sample-review-notes.md), and the format it learns your conventions into in [`review-me-senior/examples/sample-rules.md`](review-me-senior/examples/sample-rules.md).
 
+On top of the core rubric, `review-me-senior` auto-detects which **best-practice packs** apply to the diff and layers their checks in, tagging every finding it sources from a pack with the pack's name — e.g. `[dotnet]`, `[blazor-fsd]` — right in the overview and the saved notes, so you can see where a point came from. It ships two packs: `dotnet` (C#/.NET idioms — null-forgiving `!` overuse, `async void`, sync-over-async, and the like) and `blazor-fsd` (Blazor WASM + MudBlazor + Fluxor + Feature Sliced Design — state mutated outside a reducer, slice boundary violations, undisposed subscriptions). Packs are just Markdown under [`review-me-senior/references/`](review-me-senior/references/), so adding your own is a matter of dropping a new `references/<name>.md` file in the same format — no code to write. Control which packs run with the `best_practice_packs` config key: `auto` (default — detect from the diff's file types and imports), `none` (core rubric only), or an explicit comma list (e.g. `dotnet, blazor-fsd`).
+
+`interview-me-senior` also picks up on this: when your diff leans on a crash-prone idiom or a modern best-practice deviation, it may turn that into a pointed interview question rather than just a design one.
+
 The rest of this README covers `interview-me-senior` in detail.
 
 ## Install
