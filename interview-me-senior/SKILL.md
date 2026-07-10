@@ -100,6 +100,21 @@ cosmetic questions. Most real changes, even small ones like adding a retry wrapp
 yield several angles (where the logic lives, backoff strategy, which errors retry,
 idempotency, observability), so reaching `core_questions` is the default outcome.
 
+**Best-practice grilling nudge.** While building the decision map, if the diff
+clearly leans on a crash-prone idiom or deviates from a modern best practice, you
+**may** turn that into one of your decision-point questions instead of a neutral
+"why did you do X" — e.g. *"you used the null-forgiving operator in several
+spots — what's your runtime guarantee those aren't null?"* This stays a
+**question**, not a finding: you are still asking the user to justify a choice and
+scoring their reasoning, not listing the smell for them or telling them it's wrong.
+Language-general examples worth turning into a question this way: null-forgiving
+operators, unobserved async (e.g. async-void or other fire-and-forget patterns),
+sync-over-async blocking calls, swallowed errors, undisposed resources. These
+questions still come out of and count within the `core_questions` budget above —
+do not add extra questions beyond it — and are scored under the existing
+`dimensions` (typically Technical judgment and/or Risk & edge-case thinking), not a
+separate rubric.
+
 ## Phase 2 — Calibrate
 
 Now speak. Tell the user you've finished reviewing and state the bar. Keep it to a
