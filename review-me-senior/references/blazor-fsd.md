@@ -39,15 +39,18 @@
 
 ## Fluxor: component reads state directly instead of via `IState<T>`
 
-- **Flag:** A component injecting the store/state object directly and reading its current value instead of injecting `IState<LeadListState>` and binding to `.Value` (or subscribing via `StateChanged`).
-- **Why:** `IState<T>` is what wires the component into Fluxor's change notifications — inject anything else and the component reads a snapshot once, then never re-renders when the store updates, so the UI silently goes stale after the first dispatch.
+- **Flag:** A component injecting the concrete feature/state type or a singleton "state holder" service directly and reading its current value, instead of injecting `IState<LeadListState>` and letting Fluxor's change notifications drive re-render.
+- **Why:** `IState<T>` is what exposes Fluxor's current state to a component, but injecting it isn't the whole story — the component also has to inherit `FluxorComponent` (or explicitly subscribe to `IState<T>.StateChanged`) to actually re-render when the store updates. Bypassing `IState<T>` altogether — injecting the raw state type or a singleton that mirrors it outside Fluxor — is worse still: the component reads a snapshot once and never re-renders when the store updates, so the UI silently goes stale after the first dispatch.
 - **Category:** design
 - **Tier:** Major
 - **Example:**
   ```razor
-  @inject IStore Store
+  @* LeadListCache is a plain singleton registered alongside Fluxor, mirroring
+     state that should live in LeadListState — reading it here bypasses the
+     store entirely, so the count never updates after the first render. *@
+  @inject LeadListCache Cache
 
-  <MudText>@Store.State.GetType().GetProperty("LeadCount")</MudText>
+  <MudText>@Cache.Leads.Count leads</MudText>
   ```
 
 ## FSD: slice boundary violations
@@ -114,7 +117,7 @@
 ## Blazor WASM: giant components and parameter mutation
 
 - **Flag:** A single `.razor` component mixing markup, state, and business logic well past a screen's worth of code (a good sign is a `@code` block doing orchestration that belongs in a slice's feature logic), a `[Parameter]` value mutated inside the component that owns it, or a hand-rolled `StateHasChanged()` call papering over a binding that should just work.
-- **Why:** A component that's grown into "the page plus all its logic" can't be tested or reused independently and becomes the one file everyone's afraid to touch. Mutating a `[Parameter]` breaks the one-way data flow Blazor is built around — the parent's copy and the child's mutated copy diverge silently. A `StateHasChanged()` call usually means a data-binding or Fluxor subscription is missing, not that the framework needs a manual nudge.
+- **Why:** A component that's grown into "the page plus all its logic" can't be tested or reused independently and becomes the one file everyone's afraid to touch. Mutating a `[Parameter]` breaks the one-way data flow Blazor is built around — the parent's copy and the child's mutated copy diverge silently. A hand-rolled `StateHasChanged()` call is legitimate after something outside Blazor's render pipeline changes state — a JS interop callback, a timer, a background-task continuation — but reaching for it to make an otherwise-normal data binding or Fluxor subscription update is the smell: it usually means that binding or subscription should just work and doesn't.
 - **Category:** maintainability
 - **Tier:** Minor
 - **Example:**

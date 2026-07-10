@@ -58,7 +58,7 @@
 
 ## Undisposed `IDisposable` / missing `using`
 
-- **Flag:** An `IDisposable` (`HttpClient` misuse aside, think `FileStream`, `SqlConnection`, `MemoryStream`, a Fluxor/DI-scoped resource, a manually-created `CancellationTokenSource`) constructed without a `using`/`using var`/`try`-`finally` that guarantees disposal.
+- **Flag:** An `IDisposable` (`HttpClient` misuse aside, think `FileStream`, `SqlConnection`, a manually-created `CancellationTokenSource`) constructed without a `using`/`using var`/`try`-`finally` that guarantees disposal.
 - **Why:** Undisposed disposables leak the underlying OS handle, connection, or unmanaged buffer. In a long-running service that's a slow handle leak that eventually exhausts the connection pool or file-handle table — the kind of bug that only shows up under load, days after deploy.
 - **Category:** risk
 - **Tier:** Major
