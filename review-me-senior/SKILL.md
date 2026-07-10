@@ -221,7 +221,10 @@ normal review point:
   see in the diff).
 
 Pack findings are ordinary review points from here on: they rank, drill in, and get
-drafted exactly like any other point. **`rules.md` memory still wins over a pack.**
+drafted exactly like any other point. A pack finding whose Category has been removed
+from the enabled `categories` config is suppressed exactly like any other point in a
+muted category — pack findings are ordinary review points and obey the same category
+muting as everything else in Phase 2. **`rules.md` memory still wins over a pack.**
 Apply the rule-matching above to pack findings too: a pack finding that matches an
 **`accepted`** rule is filtered out (and counted among the filtered points, exactly
 as today) — a blessed pattern stays blessed even when a pack would otherwise flag

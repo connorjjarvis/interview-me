@@ -1,6 +1,6 @@
 # blazor-fsd pack
 
-**Applies to:** Blazor WebAssembly + MudBlazor + Fluxor + Feature Sliced Design — files matching `*.razor` (and `*.cs` alongside them), or code with `using Fluxor` / `using MudBlazor`.
+**Applies to:** Blazor WebAssembly + MudBlazor + Fluxor + Feature Sliced Design — files matching `*.razor`, or `*.cs` files containing a Blazor/Fluxor/MudBlazor marker (`using Fluxor`, `using MudBlazor`, `[ReducerMethod]`, `IState<`, or a `ComponentBase`/`FluxorComponent` subclass). Do NOT enable on plain `*.cs` with none of these signals.
 
 ## Fluxor: mutating state outside a reducer
 
