@@ -1,4 +1,4 @@
-> Lives at ~/.review-me-senior/<repo-name>/rules.md — local, per-user, out of your repo.
+> Lives at ~/.review-me/<repo-name>/rules.md — local, per-user, out of your repo.
 
 # Learned rules — quote-service
 

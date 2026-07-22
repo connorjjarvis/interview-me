@@ -1,4 +1,4 @@
-> Saved to ~/.review-me-senior/<repo-name>/ — not committed to your repo.
+> Saved to ~/.review-me/<repo-name>/ — not committed to your repo.
 
 # Review — feature/response-cache-layer — 2026-07-07
 

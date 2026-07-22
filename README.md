@@ -14,20 +14,20 @@ It is not a collaborator. It doesn't suggest fixes, doesn't offer to refactor, d
 
 This repo ships two independent skills. Install either one on its own, or both — they don't depend on each other.
 
-- **[`interview-me-senior`](interview-me-senior/)** — get interviewed and scored on the decisions in a change you just made.
-- **[`review-me-senior`](review-me-senior/)** — a review copilot: ranked review points + draftable comments for a branch/PR, learns your conventions, no score.
+- **[`interview-me`](interview-me/)** — get interviewed and scored on the decisions in a change you just made.
+- **[`review-me`](review-me/)** — a review copilot: ranked review points + draftable comments for a branch/PR, learns your conventions, no score.
 
-`review-me-senior` has its own config block at the top of [`review-me-senior/SKILL.md`](review-me-senior/SKILL.md). See a full worked example in [`review-me-senior/examples/sample-review-notes.md`](review-me-senior/examples/sample-review-notes.md), and the format it learns your conventions into in [`review-me-senior/examples/sample-rules.md`](review-me-senior/examples/sample-rules.md).
+`review-me` has its own config block at the top of [`review-me/SKILL.md`](review-me/SKILL.md). See a full worked example in [`review-me/examples/sample-review-notes.md`](review-me/examples/sample-review-notes.md), and the format it learns your conventions into in [`review-me/examples/sample-rules.md`](review-me/examples/sample-rules.md).
 
-On top of the core rubric, `review-me-senior` auto-detects which **best-practice packs** apply to the diff and layers their checks in, tagging every finding it sources from a pack with the pack's name — e.g. `[dotnet]`, `[blazor-fsd]` — right in the overview and the saved notes, so you can see where a point came from. It ships two packs: `dotnet` (C#/.NET idioms — null-forgiving `!` overuse, `async void`, sync-over-async, and the like) and `blazor-fsd` (Blazor WASM + MudBlazor + Fluxor + Feature Sliced Design — state mutated outside a reducer, slice boundary violations, undisposed subscriptions). Packs are just Markdown under [`review-me-senior/references/`](review-me-senior/references/), so adding your own is a matter of dropping a new `references/<name>.md` file in the same format — no code to write. Control which packs run with the `best_practice_packs` config key: `auto` (default — detect from the diff's file types and imports), `none` (core rubric only), or an explicit comma list (e.g. `dotnet, blazor-fsd`).
+On top of the core rubric, `review-me` auto-detects which **best-practice packs** apply to the diff and layers their checks in, tagging every finding it sources from a pack with the pack's name — e.g. `[dotnet]`, `[blazor-fsd]` — right in the overview and the saved notes, so you can see where a point came from. It ships two packs: `dotnet` (C#/.NET idioms — null-forgiving `!` overuse, `async void`, sync-over-async, and the like) and `blazor-fsd` (Blazor WASM + MudBlazor + Fluxor + Feature Sliced Design — state mutated outside a reducer, slice boundary violations, undisposed subscriptions). Packs are just Markdown under [`review-me/references/`](review-me/references/), so adding your own is a matter of dropping a new `references/<name>.md` file in the same format — no code to write. Control which packs run with the `best_practice_packs` config key: `auto` (default — detect from the diff's file types and imports), `none` (core rubric only), or an explicit comma list (e.g. `dotnet, blazor-fsd`).
 
-`interview-me-senior` also picks up on this: when your diff leans on a crash-prone idiom or a modern best-practice deviation, it may turn that into a pointed interview question rather than just a design one.
+`interview-me` also picks up on this: when your diff leans on a crash-prone idiom or a modern best-practice deviation, it may turn that into a pointed interview question rather than just a design one.
 
-The rest of this README covers `interview-me-senior` in detail.
+The rest of this README covers `interview-me` in detail.
 
 ## Install
 
-This repo ships `interview-me-senior/` and `review-me-senior/`. Install whichever one(s) you want into whichever tool you use — the `SKILL.md` format is the shared [Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) standard, so the same folders work across all three.
+This repo ships `interview-me/` and `review-me/`. Install whichever one(s) you want into whichever tool you use — the `SKILL.md` format is the shared [Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) standard, so the same folders work across all three.
 
 ### Claude Code
 
@@ -36,16 +36,16 @@ Copy the skill folder(s) you want into your `~/.claude/skills/`.
 macOS/Linux (both skills):
 
 ```bash
-cp -r interview-me-senior review-me-senior ~/.claude/skills/
+cp -r interview-me review-me ~/.claude/skills/
 ```
 
 Windows (PowerShell, both skills):
 
 ```powershell
-Copy-Item -Recurse interview-me-senior,review-me-senior "$HOME\.claude\skills\"
+Copy-Item -Recurse interview-me,review-me "$HOME\.claude\skills\"
 ```
 
-Only want one? Copy just that folder, e.g. `cp -r review-me-senior ~/.claude/skills/`.
+Only want one? Copy just that folder, e.g. `cp -r review-me ~/.claude/skills/`.
 
 ### GitHub Copilot CLI
 
@@ -55,24 +55,24 @@ Copilot CLI discovers Agent Skills from `~/.copilot/skills/` (personal, all proj
 
 ```bash
 git clone https://github.com/connorjjarvis/interview-me.git
-copilot skill add ./interview-me/interview-me-senior
-copilot skill add ./interview-me/review-me-senior
+copilot skill add ./interview-me/interview-me
+copilot skill add ./interview-me/review-me
 ```
 
-If you're already in a session, run `/skills reload`, then confirm it loaded with `/skills info interview-me-senior` or `/skills info review-me-senior`.
+If you're already in a session, run `/skills reload`, then confirm it loaded with `/skills info interview-me` or `/skills info review-me`.
 
 **Option B — copy it in manually.**
 
 macOS/Linux (both skills):
 
 ```bash
-cp -r interview-me/interview-me-senior interview-me/review-me-senior ~/.copilot/skills/
+cp -r interview-me/interview-me interview-me/review-me ~/.copilot/skills/
 ```
 
 Windows (PowerShell, both skills):
 
 ```powershell
-Copy-Item -Recurse interview-me\interview-me-senior,interview-me\review-me-senior "$HOME\.copilot\skills\"
+Copy-Item -Recurse interview-me\interview-me,interview-me\review-me "$HOME\.copilot\skills\"
 ```
 
 Only want one? Run `copilot skill add` (or the copy) for just that folder.
@@ -85,14 +85,14 @@ macOS/Linux (both skills):
 
 ```bash
 mkdir -p ~/.codex/skills
-cp -r interview-me-senior review-me-senior ~/.codex/skills/
+cp -r interview-me review-me ~/.codex/skills/
 ```
 
 Windows (PowerShell, both skills):
 
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
-Copy-Item -Recurse interview-me-senior,review-me-senior "$HOME\.codex\skills\"
+Copy-Item -Recurse interview-me,review-me "$HOME\.codex\skills\"
 ```
 
 Only want one? Copy just that folder instead.
@@ -151,11 +151,11 @@ decorator or a per-endpoint config flag on the client that says
 ================================================================
 ```
 
-See a full worked example, including the complete transcript, in [`interview-me-senior/examples/sample-scorecard.md`](interview-me-senior/examples/sample-scorecard.md).
+See a full worked example, including the complete transcript, in [`interview-me/examples/sample-scorecard.md`](interview-me/examples/sample-scorecard.md).
 
 ## Config
 
-Everything below lives in a single commented block at the top of `interview-me-senior/SKILL.md`. Edit it in place to retune the interview — no logic to touch.
+Everything below lives in a single commented block at the top of `interview-me/SKILL.md`. Edit it in place to retune the interview — no logic to touch.
 
 | Key | Default | Purpose |
 | --- | --- | --- |

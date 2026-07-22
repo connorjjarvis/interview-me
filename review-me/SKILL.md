@@ -1,6 +1,6 @@
 ---
-name: review-me-senior
-description: A staff-level review copilot for a branch or PR. Reads the diff, gives you a ranked map of review points (correctness, risk, design, tests, security, nits) each with the reasoning and a draftable comment in your voice, then lets you drill into the ones that matter. It does not score you and does not post anything — it helps you understand the code and write the review yourself, and it learns your project's conventions over time. Use when the user says "review me", "review this branch", "review this PR", "help me review", or "help me write a review". (For being interviewed and scored on your own decisions, use interview-me-senior instead.)
+name: review-me
+description: A staff-level review copilot for a branch or PR. Reads the diff, gives you a ranked map of review points (correctness, risk, design, tests, security, nits) each with the reasoning and a draftable comment in your voice, then lets you drill into the ones that matter. It does not score you and does not post anything — it helps you understand the code and write the review yourself, and it learns your project's conventions over time. Use when the user says "review me", "review this branch", "review this PR", "help me review", or "help me write a review". (For being interviewed and scored on your own decisions, use interview-me instead.)
 ---
 
 ```
@@ -13,8 +13,8 @@ context_sources: diff, pr, focus    # diff always on; pr = optional pasted/fetch
 draft_comments: true
 comment_style: concise       # concise | detailed
 rules_enabled: true
-rules_dir: ~/.review-me-senior/<repo-name>/   # learned project rules — OUT OF REPO
-save_dir: ~/.review-me-senior/<repo-name>/    # saved review notes — OUT OF REPO
+rules_dir: ~/.review-me/<repo-name>/   # learned project rules — OUT OF REPO
+save_dir: ~/.review-me/<repo-name>/    # saved review notes — OUT OF REPO
 save_notes: ask              # ask | always | never
 include_diff_snippets: true  # quote reviewed code in SAVED notes (terminal always shows it)
 redact_secrets: true
@@ -315,7 +315,7 @@ When the user blesses a pattern or states a rule:
 3. **Write only on an explicit yes.** On confirmation, resolve `rules_dir` via the
    Artifact-safety rules below, create the file and directory if absent (a new
    `rules.md` gets the same top privacy note as `examples/sample-rules.md`:
-   `> Lives at ~/.review-me-senior/<repo-name>/rules.md — local, per-user, out of
+   `> Lives at ~/.review-me/<repo-name>/rules.md — local, per-user, out of
    your repo.`), and append the block. If the user declines, discard it and move
    on. Never write on silence or a maybe.
 4. Track every rule written this session — you list them in the saved notes'
@@ -334,7 +334,7 @@ When saving, build the notes in the exact shape of
 1. Top privacy note line — substitute the actual resolved repo name (not the
    literal `<repo-name>` token) in place of `<repo-name>` below, the same repo
    name already resolved for the printed `save_dir` path:
-   `> Saved to ~/.review-me-senior/<repo-name>/ — not committed to your repo.`
+   `> Saved to ~/.review-me/<repo-name>/ — not committed to your repo.`
 2. `# Review — <branch> — <YYYY-MM-DD>`, then a **Base:** line and a **Focus:**
    line (the `focus` you captured; write "full pass" if none).
 3. A **Summary:** line — total points, counts by tier, counts by category, and the
@@ -367,7 +367,7 @@ These are mandatory and apply to **both** `save_dir` (review notes) **and**
 
 1. **Resolve the path.** Expand `~` to the user's home directory and `<repo-name>`
    to the current repo's directory name. The defaults therefore resolve to
-   `<home>/.review-me-senior/<repo-name>/`, which is **outside** the repo. Create
+   `<home>/.review-me/<repo-name>/`, which is **outside** the repo. Create
    the directory (and parents) if it does not exist.
 
 2. **If a resolved path is inside the current repo** (only possible when the user

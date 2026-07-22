@@ -1,5 +1,5 @@
 ---
-name: interview-me-senior
+name: interview-me
 description: Runs a staff-level engineering interview on a piece of work you just finished — reads the git diff (plus any work-item context you provide), grills you on why you made the decisions you did versus the alternatives, probes weak answers, and scores you against a configurable rubric. Use when the user says "interview me", "grill me on this", "review/defend my decisions", or "score my work" after completing a change.
 ---
 
